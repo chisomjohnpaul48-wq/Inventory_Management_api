@@ -22,7 +22,7 @@ class ResponseModelStockGet(BaseModel):
     Inventory: List[StockItem]
 
 class RequestModelUpdateStock(BaseModel):
-    name: Optional[str]
-    description: Optional[str]
-    price: Optional[int]
-    quantity: Optional[int]
+    name: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[Decimal] = Field(default=None, ge=Decimal("0.0"), description="Price must be Nonnegative.")
+    quantity: Optional[int] = Field(default=None, ge=0, description="Quantity must be Nonnegative.")

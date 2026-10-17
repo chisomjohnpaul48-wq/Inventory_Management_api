@@ -31,9 +31,10 @@ def delete_stock_endpoint(id: int, conn=Depends(get_conn)):
     delete_stock(conn, id)
     return {"message": "Stock deleted successfully."}
 
-@router.patch("/stocks/{id}", status_code=201)
+@router.patch("/stocks/{id}", status_code=200)
 def update_stock_endpoint(id: int, update: RequestModelUpdateStock, conn=Depends(get_conn)):
     update_info = update.model_dump(exclude_unset=True)
     result = update_stock_service(conn, id, update_info)
     if not result:
         raise HTTPException(status_code=404, detail="Not found")
+    return {"message": "Stock updated successfully", "Updated info": result}
