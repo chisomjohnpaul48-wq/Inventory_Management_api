@@ -26,3 +26,19 @@ class RequestModelUpdateStock(BaseModel):
     description: Optional[str] = None
     price: Optional[Decimal] = Field(default=None, ge=Decimal("0.0"), description="Price must be Nonnegative.")
     quantity: Optional[int] = Field(default=None, ge=0, description="Quantity must be Nonnegative.")
+
+class MovementItem(BaseModel):
+    id: int
+    stock_id: int
+    movement_type: str
+    quantity_change: int
+    new_quantity: int
+    reason: Optional[str] = None
+    created_at: datetime
+
+class ResponseModelMovementsGet(BaseModel):
+    Movements: List[MovementItem]
+
+class Deleted(BaseModel):
+    message: str
+    Deleted_info: StockItem

@@ -12,6 +12,18 @@ def init_setup():
                     price DECIMAL(10,2) NOT NULL DEFAULT 0.00 CHECK (price >= 0),
                     quantity INTEGER NOT NULL DEFAULT 0 CHECK (quantity >= 0),
                     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMPTZ DEFAULT NOW()
+                    updated_at TIMESTAMPTZ DEFAULT NOW(),
+                    is_deleted BOOLEAN NOT NULL DEFAULT FALSE
+                );
+
+                CREATE TABLE IF NOT EXISTS stock_movement (
+                    id SERIAL PRIMARY KEY,
+                    stock_id INTEGER REFERENCES stocks(id) NOT NULL,
+                    movement_type TEXT NOT NULL,
+                    quantity_change INTEGER NOT NULL,
+                    new_quantity INTEGER NOT NULL,
+                    reason TEXT,
+                    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
                 );
 """)
+
