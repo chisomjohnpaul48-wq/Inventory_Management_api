@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.config import settings
 from app.database import pool
+from app.routers import products
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -25,3 +26,5 @@ app = FastAPI(
     debug=settings.DEBUG,
     lifespan=lifespan
 )
+
+app.include_router(products.router)

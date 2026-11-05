@@ -14,7 +14,8 @@ pool = ConnectionPool(
     )
 
 def get_connection():
-    return pool.connection()
+    with pool.connection() as connection:
+        yield connection
 
 def get_pool():
     return pool
