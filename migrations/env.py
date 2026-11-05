@@ -1,9 +1,8 @@
-import os
-
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from sqlalchemy.engine import make_url
 
 from alembic import context
 
@@ -17,12 +16,45 @@ config = context.config
 
 ##########################################################################################
 
-db_url = settings.DATABASE_URL
+x_args = context.get_x_argument(as_dictionary=True)
+environment = x_args.get("environment", "app")
+
+if environment == "app":
+    db_url = settings.DATABASE_URL
+
+elif environment == "test":
+    db_url = settings.TEST_DATABASE_URL
+
+    if not db_url:
+        raise RuntimeError(
+            "TEST_DATABASE_URL is required when environment = 'test'."
+        )
+
+    database_name = make_url(db_url).database
+
+    if database_name != "inventory_test":
+        raise RuntimeError(
+            "Unsafe test database. Expected 'inventory_test', "
+            f"received '{database_name}'."
+        )
+
+else:
+    raise ValueError(
+        f"Unsupported Alembic environment: '{environment}'. "
+        "Expected 'app' or 'test'."
+    )
+
 if not db_url:
-    raise RuntimeError("DATABASE_URL is missing from the environment.")
+    raise RuntimeError(
+        f"Database URL is missing for environment '{environment}'."
+    )
 
 if db_url.startswith("postgresql://"):
-    db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
+    db_url = db_url.replace(
+        "postgresql://",
+        "postgresql+psycopg://",
+        1
+    )
 
 config.set_main_option("sqlalchemy.url", db_url)
 

@@ -1,7 +1,7 @@
 from enum import Enum
 
 class MovementType(str, Enum):
-    RECIEPT = "reciept"
+    RECEIPT = "receipt"
     SALE = "sale"
     ADJUSTMENT = "adjustment"
     RETURN = "return"
