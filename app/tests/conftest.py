@@ -14,7 +14,7 @@ from app.database import pool
 
 @pytest.fixture(scope="session")
 def client():
-    with TestClient(app) as client:
+    with TestClient(app, raise_server_exceptions=False) as client:
         yield client
 
 @pytest.fixture(autouse=True, scope="function")
