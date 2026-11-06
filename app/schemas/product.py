@@ -11,9 +11,9 @@ PriceConstraint = Annotated[Decimal, Field(ge=Decimal("0.00"), max_digits=10, de
 DescriptionConstraint = Annotated[Optional[str], StringConstraints(strip_whitespace=True, min_length=1, max_length=500)]
 class RequestModelCreateProduct(BaseModel):
     name: NonEmptyStr
-    description: DescriptionConstraint
+    description: DescriptionConstraint = None
     price: PriceConstraint
-    quantity: int = Field(default=0, ge=0, description="Quantity must be nonnegative.")
+    quantity: int = Field(default=0, ge=0, le=1_000_000, description="Quantity must be nonnegative.")
 
     @field_validator("description", mode="before")
     @classmethod
@@ -22,7 +22,7 @@ class RequestModelCreateProduct(BaseModel):
             return None
         
         if isinstance(value, str) and not value.strip():
-            return value
+            return None
 
         return value or None
 
