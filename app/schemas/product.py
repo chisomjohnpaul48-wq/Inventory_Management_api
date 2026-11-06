@@ -1,20 +1,36 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from pydantic import BaseModel, Field, StringConstraints, field_validator
+from typing import Optional, Annotated
 from decimal import Decimal
-from app.schemas.stock_movement import MovementType
 from datetime import datetime
 
+
+NonEmptyStr = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
+
+PriceConstraint = Annotated[Decimal, Field(ge=Decimal("0.00"), max_digits=10, decimal_places=2)]
+
+DescriptionConstraint = Annotated[Optional[str], StringConstraints(strip_whitespace=True, min_length=1, max_length=500)]
 class RequestModelCreateProduct(BaseModel):
-    name: str
-    description: Optional[str] = None
-    price: Decimal = Field(default=Decimal("0.0"), ge=Decimal("0.0"), description="Price must be Nonnegative.")
+    name: NonEmptyStr
+    description: DescriptionConstraint
+    price: PriceConstraint
     quantity: int = Field(default=0, ge=0, description="Quantity must be nonnegative.")
-    movement_type: MovementType = MovementType.OPENING_BALANCE
+
+    @field_validator("description", mode="before")
+    @classmethod
+    def no_empty_str(cls, value: str | None):
+        if value is None:
+            return None
+        
+        if isinstance(value, str) and not value.strip():
+            return value
+
+        return value or None
 
 class ResponseModelCreateProduct(BaseModel):
-    name: str
-    description: Optional[str] = "NULL"
-    price: Decimal = Field(default=Decimal("0.0"), ge=Decimal("0.0"), description="Price must be Nonnegative.")
-    quantity: int = Field(default=0, ge=0, description="Quantity must be nonnegative.")
+    id: int
+    name: NonEmptyStr
+    description: DescriptionConstraint
+    price: Decimal
+    quantity: int
     created_at: datetime
-    message: str = "Product added sucessfully"
+    message: str = "Product added successfully"
